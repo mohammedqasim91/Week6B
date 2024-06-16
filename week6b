@@ -1,0 +1,213 @@
+#Creating the Robot Database
+
+CREATE DATABASE robot_db;
+
+USE robot_db;
+
+CREATE TABLE robots (
+                        id INT PRIMARY KEY,
+                        name VARCHAR(50),
+                        model VARCHAR(50),
+                        category VARCHAR(50),
+                        price DECIMAL(10, 2),
+                        weight DECIMAL(6, 2),
+                        battery_capacity INT
+);
+
+CREATE TABLE components (
+                            id INT PRIMARY KEY,
+                            robot_id INT,
+                            component_name VARCHAR(50),
+                            component_type VARCHAR(50),
+                            FOREIGN KEY (robot_id) REFERENCES robots(id)
+);
+
+CREATE TABLE maintenance_logs (
+                                  id INT PRIMARY KEY,
+                                  robot_id INT,
+                                  maintenance_date DATE,
+                                  description VARCHAR(200),
+                                  FOREIGN KEY (robot_id) REFERENCES robots(id)
+);
+
+
+INSERT INTO robots (id, name, model, category, price, weight, battery_capacity)
+VALUES
+    (1, 'RoboMaid', 'RM-100', 'Household', 999.99, 5.5, 5000),
+    (2, 'RoboChef', 'RC-200', 'Culinary', 1499.99, 8.2, 7500),
+    (3, 'RoboGuard', 'RG-300', 'Security', 2999.99, 12.8, 10000),
+    (4, 'RoboMedic', 'RM-400', 'Medical', 4999.99, 6.3, 6000),
+    (5, 'RoboBuilder', 'RB-500', 'Construction', 3499.99, 15.6, 12000);
+
+
+INSERT INTO components (id, robot_id, component_name, component_type)
+VALUES
+    (1, 1, 'Vacuum Pump', 'Cleaning'),
+    (2, 1, 'Brushes', 'Cleaning'),
+    (3, 2, 'Knife Attachment', 'Culinary'),
+    (4, 2, 'Induction Cooktop', 'Culinary'),
+    (5, 3, 'Surveillance Camera', 'Security'),
+    (6, 3, 'Motion Sensors', 'Security'),
+    (7, 4, 'Surgical Laser', 'Medical'),
+    (8, 4, 'Vital Signs Monitor', 'Medical'),
+    (9, 5, 'Welding Torch', 'Construction'),
+    (10, 5, 'Hydraulic Arm', 'Construction');
+
+INSERT INTO maintenance_logs (id, robot_id, maintenance_date, description)
+VALUES
+    (1, 1, '2023-01-15', 'Replaced vacuum pump'),
+    (2, 2, '2023-02-10', 'Recalibrated knife attachment'),
+    (3, 3, '2023-03-05', 'Upgraded motion sensors'),
+    (4, 4, '2023-04-20', 'Performed laser alignment'),
+    (5, 5, '2023-05-12', 'Replaced welding torch nozzle'),
+    (6, 1, '2023-06-01', 'Cleaned brush assembly'),
+    (7, 2, '2023-07-18', 'Replaced induction cooktop'),
+    (8, 3, '2023-08-22', 'Updated surveillance camera firmware'),
+    (9, 4, '2023-09-08', 'Recalibrated vital signs monitor'),
+    (10, 5, '2023-10-30', 'Serviced hydraulic arm');
+
+SELECT COUNT(*) FROM robots;
+
+SELECT AVG(price) FROM robots;
+
+SELECT MIN(price), MAX(price) FROM robots;
+
+SELECT category, COUNT(*) FROM robots GROUP BY category;
+
+SELECT category, AVG(price) FROM robots GROUP BY category HAVING AVG(price) > 2000;
+
+SELECT * FROM robots WHERE name LIKE 'Robo%';
+
+SELECT * FROM robots WHERE price BETWEEN 1000 AND 3000;
+
+SELECT * FROM robots WHERE category = 'Household' AND price < 1500;
+
+SELECT * FROM robots WHERE weight > 10;
+
+SELECT * FROM robots ORDER BY price DESC;
+
+SELECT DISTINCT category FROM robots;
+
+#Database Requirements
+
+CREATE DATABASE superhero_db;
+
+USE superhero_db;
+
+CREATE TABLE superheroes (
+                             id INT AUTO_INCREMENT PRIMARY KEY,
+                             name VARCHAR(50) NOT NULL,
+                             superpower VARCHAR(100) NOT NULL,
+                             city VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE missions (
+                          id INT AUTO_INCREMENT PRIMARY KEY,
+                          superhero_id INT,
+                          mission_name VARCHAR(100) NOT NULL,
+                          start_date DATE NOT NULL,
+                          end_date DATE,
+                          FOREIGN KEY (superhero_id) REFERENCES superheroes(id)
+);
+
+INSERT INTO superheroes (name, superpower, city) VALUES
+                                                     ('Superman', 'Super strength, flight', 'Metropolis'),
+                                                     ('Batman', 'High intelligence, martial arts', 'Gotham'),
+                                                     ('Wonder Woman', 'Super strength, agility', 'Themyscira'),
+                                                     ('Flash', 'Super speed', 'Central City'),
+                                                     ('Aquaman', 'Control over sea life, super strength', 'Atlantis');
+
+INSERT INTO missions (superhero_id, mission_name, start_date, end_date) VALUES
+                                                                            (1, 'Save Metropolis from Lex Luthor', '2024-01-01', '2024-01-02'),
+                                                                            (2, 'Stop Joker\'s crime spree', '2024-01-05', '2024-01-06'),
+                                                                            (3, 'Defeat Ares', '2024-01-10', '2024-01-15'),
+                                                                            (4, 'Prevent bank robbery', '2024-01-20', '2024-01-21'),
+                                                                            (5, 'Protect Atlantis from invasion', '2024-01-25', '2024-01-30'),
+                                                                            (1, 'Rescue space shuttle', '2024-02-01', '2024-02-02'),
+                                                                            (2, 'Investigate Riddler\'s clues', '2024-02-05', '2024-02-10'),
+                                                                            (3, 'Negotiate peace treaty', '2024-02-15', '2024-02-20'),
+                                                                            (4, 'Race against Reverse Flash', '2024-02-25', '2024-02-25'),
+                                                                            (5, 'Find lost underwater city', '2024-03-01', '2024-03-05');
+
+SELECT s.name, COUNT(m.id) AS mission_count
+FROM superheroes s
+         JOIN missions m ON s.id = m.superhero_id
+GROUP BY s.name
+ORDER BY mission_count DESC
+LIMIT 1;
+
+SELECT s.name, AVG(DATEDIFF(m.end_date, m.start_date)) AS average_duration
+FROM superheroes s
+         JOIN missions m ON s.id = m.superhero_id
+GROUP BY s.name;
+
+
+SELECT m.mission_name, DATEDIFF(m.end_date, m.start_date) AS duration
+FROM missions m
+ORDER BY duration DESC
+LIMIT 1;
+
+
+SELECT m.mission_name, DATEDIFF(m.end_date, m.start_date) AS duration
+FROM missions m
+ORDER BY duration ASC
+LIMIT 1;
+
+SELECT s.city, COUNT(m.id) AS total_missions
+FROM superheroes s
+         JOIN missions m ON s.id = m.superhero_id
+GROUP BY s.city;
+
+SELECT name
+FROM superheroes
+WHERE name LIKE 'Super%';
+
+SELECT *
+FROM missions
+WHERE start_date BETWEEN '2024-01-01' AND '2024-01-31';
+
+SELECT *
+FROM superheroes
+WHERE city = 'New York' AND superpower LIKE '%strength%';
+
+SELECT *
+FROM missions
+WHERE DATEDIFF(end_date, start_date) > 5;
+
+SELECT s.name, COUNT(m.id) AS mission_count
+FROM superheroes s
+         JOIN missions m ON s.id = m.superhero_id
+GROUP BY s.name
+ORDER BY mission_count DESC;
+
+SELECT DISTINCT city
+FROM superheroes;
+
+#INNER JOIN
+SELECT s.name, m.mission_name
+FROM superheroes s
+         INNER JOIN missions m ON s.id = m.superhero_id;
+
+#LEFT JOIN
+SELECT s.name, m.mission_name
+FROM superheroes s
+         LEFT JOIN missions m ON s.id = m.superhero_id;
+
+#RIGHT JOIN
+SELECT s.name, m.mission_name
+FROM superheroes s
+         RIGHT JOIN missions m ON s.id = m.superhero_id;
+
+
+SELECT s.name, m.mission_name, m.start_date, m.end_date
+FROM superheroes s
+         INNER JOIN missions m ON s.id = m.superhero_id;
+
+SELECT s.name, m.mission_name, m.start_date, m.end_date
+FROM superheroes s
+         LEFT JOIN missions m ON s.id = m.superhero_id;
+
+SELECT s.name, m.mission_name, m.start_date, m.end_date
+FROM superheroes s
+         RIGHT JOIN missions m ON s.id = m.superhero_id;
+
